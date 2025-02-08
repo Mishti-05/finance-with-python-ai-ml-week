@@ -26,3 +26,10 @@
     - Press Ctrl/Cmd + Shift + P
     - Type: "Python: Select Interpreter"
     - Choose the interpreter: finance_env
+
+### Open Jupyter Notebook
+
+1. Open Jupyter Notebook:
+    - In Terminal: `jupyter notebook`
+    - This should open in browser
+2. Create a new Python3 notebook in the desired folder
