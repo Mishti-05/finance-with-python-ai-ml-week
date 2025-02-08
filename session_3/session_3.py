@@ -115,3 +115,47 @@ fig.show()
 Checkout different Financial Charts that exist and try and plot most of them with a writeup of what they represent.
 Link: [https://plotly.com/python/financial-charts/](https://plotly.com/python/financial-charts/)
 """
+
+
+"""
+# Advanced Time Series EDA and Techincal Indicator Analysis
+
+In this part, we will learn about Price trend analysis using moving averages, momentum indicators (RSI, MACD), volatility analysis (Bollinger Bands), etc.
+"""
+
+import yfinance as yf
+import plotly.express as px
+import matplotlib.dates as mdates
+
+stocks = ["AMZN", "GOOGL", "TSLA"]
+
+data_dict = {}
+
+for ticker in stocks:
+    df = yf.download(ticker, period="3y", interval="1d")
+    df.reset_index(inplace=True)
+    data_dict[ticker] = df
+    print(f"\n{ticker} data (first 10 rows):")
+    print(df.head(10))
+    print(f"\n{ticker} data (last 10 rows):")
+    print(df.tail(10))
+
+
+# RSI Calculation - Relative Strength Index
+def calculate_RSI(series, period=14):
+    delta = series.diff()
+    gain = delta.clip(lower=0)
+    loss = -1 * delta.clip(upper=0)
+
+    avg_gain = gain.rolling(window=period, min_periods=period).mean()
+    avg_loss = loss.rolling(window=period, min_periods=period).mean()
+
+    rs = avg_gain / avg_loss
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
+
+
+tesla_df = data_dict["TSLA"]
+tesla_df["RSI_14"] = calculate_RSI(df["Close"], period=14)
+pd.set_option("display.max_rows", 250)
+tesla_df.head(200)
