@@ -114,3 +114,119 @@ plt.ylabel("Value")
 plt.legend()
 plt.grid(True)
 plt.show()
+
+"""
+# Reading Real Financial Data from CSV files
+
+Read stock price data of AAPL, MSFT, JPM from csv files.
+Perform some analysis on the data.
+Merge the data and plot them using Matplotlib and Plotly.
+"""
+
+# Read CSV file using pandas
+aapl = pd.read_csv("AAPL.csv")
+jpm = pd.read_csv("JPM.csv")
+msft = pd.read_csv("MSFT.csv")
+
+# Display top 5 and last 5 using head and tail
+print("\nAAPL DATA:")
+print(aapl.head())
+print(aapl.tail())
+
+print("\nJPM DATA:")
+print(jpm.head())
+print(jpm.tail())
+
+print("\nMSFT DATA:")
+print(msft.head())
+print(msft.tail())
+
+# Display a summary of AAPL's data
+print(aapl.describe())
+
+# Display summary and other details of MSFT's data
+print(msft.describe())
+print(f"Shape: {msft.shape}")
+print(f"Columns: {msft.columns}")
+print(f"Number of Rows: {len(msft)}")
+print(f"Data Types: {msft.dtypes}")
+print(f"Date Range: {msft['Date'].min()} to {msft['Date'].max()}")
+print(f"Number of Unique values: {msft['High'].nunique()}")
+print(f"\nUnique values: {msft['High'].unique()}\n")
+print(f"Value Counts: {msft['Low'].value_counts()}")
+
+# Merge the closing prices of each stock based on the 'Date' column
+merged_data = pd.merge(
+    aapl[["Date", "Close"]],
+    jpm[["Date", "Close"]],
+    on="Date",
+    suffixes=("_AAPL", "_JPM"),
+)
+
+merged_data = pd.merge(
+    merged_data,
+    msft[["Date", "Close"]],
+    on="Date",
+)
+
+merged_data.rename(
+    columns={"Close": "Close_MSFT"}, inplace=True
+)  # inplace=True modifies original Dataframe
+print(merged_data.head(10))  # top 10 rows
+
+# Plot the closing prices of AAPL, JPM and MSFT together
+plt.figure(figsize=(20, 15))
+plt.plot(merged_data["Date"], merged_data["Close_AAPL"], label="AAPL", marker="o")
+plt.plot(merged_data["Date"], merged_data["Close_JPM"], label="JPM", marker="s")
+plt.plot(merged_data["Date"], merged_data["Close_MSFT"], label="MSFT", marker="^")
+plt.title("Closing Prices Comparison: AAPL, JPM, and MSFT")
+plt.xlabel("Date")
+plt.ylabel("Closing Price")
+plt.legend()
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.show()
+
+import plotly.graph_objects as go
+import plotly  # importing again just to show version number
+
+print(f"Plotly version: {plotly.__version__}")
+
+# Plot the closing prices of AAPL, JPM and MSFT together using Plotly
+fig = go.Figure()
+
+fig.add_trace(
+    go.Scatter(  # Type of plot
+        x=merged_data["Date"],
+        y=merged_data["Close_AAPL"],
+        mode="lines+markers",
+        name="AAPL",
+    )
+)
+
+fig.add_trace(
+    go.Scatter(
+        x=merged_data["Date"],
+        y=merged_data["Close_JPM"],
+        mode="lines+markers",
+        name="JPM",
+    )
+)
+
+fig.add_trace(
+    go.Scatter(
+        x=merged_data["Date"],
+        y=merged_data["Close_MSFT"],
+        mode="lines+markers",
+        name="MSFT",
+    )
+)
+
+fig.update_layout(
+    title="Closing Prices Comparison: AAPL, JPM, and MSFT",
+    xaxis_title="Date",
+    yaxis_title="Closing Price",
+    xaxis_tickangle=45,
+)
+
+fig.show()
